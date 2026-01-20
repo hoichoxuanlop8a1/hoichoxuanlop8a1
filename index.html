@@ -103,6 +103,19 @@
 </div>
 <button id="fireworkBtn">🎆 Bắn pháo giấy</button>
     <canvas id="fireworks"></canvas>
+    <script>
+const sounds = [
+  new Audio("fire1.mp3"),
+  new Audio("fire2.mp3"),
+  new Audio("fire3.mp3")
+];
+
+function playFireSound() {
+  const sound = sounds[Math.floor(Math.random() * sounds.length)];
+  sound.currentTime = 0;
+  sound.play();
+}
+</script>
 <script>
 const canvas = document.getElementById("fireworks");
 const ctx = canvas.getContext("2d");
