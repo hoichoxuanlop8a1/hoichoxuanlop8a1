@@ -61,31 +61,25 @@
       font-size: 0.9rem;
       opacity: 0.8;
     }
-    #fireworkBtn {
+    #fireworks {
   position: fixed;
-  bottom: 20px;
-  right: 20px;
-  z-index: 1001;
-  padding: 12px 16px;
-  font-size: 16px;
-  border: none;
-  border-radius: 999px;
-  background: linear-gradient(135deg, #ff3b3b, #ffb703);
-  color: white;
-  font-weight: bold;
-  box-shadow: 0 6px 15px rgba(0,0,0,0.25);
+  inset: 0;
+  z-index: 999;
+  pointer-events: none;
 }
 
-/* canvas pháo hoa */
-#fireworks {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  pointer-events: none;
-  z-index: 1000;
+#fireworkBtn {
+  padding: 12px 20px;
+  font-size: 16px;
+  border-radius: 999px;
+  border: none;
+  background: linear-gradient(135deg, #ffcc00, #ff5e00);
+  color: #fff;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.25);
 }
+
   </style>
 </head>
 <body>
@@ -124,29 +118,27 @@ function resize() {
 resize();
 window.addEventListener("resize", resize);
 
-function random(min, max) {
-  return Math.random() * (max - min) + min;
-}
-
 class Particle {
-  constructor(x, y) {
+  constructor(x, y, color) {
     this.x = x;
     this.y = y;
-    this.radius = random(2, 4);
-    this.color = `hsl(${Math.random() * 360}, 100%, 60%)`;
-    this.vx = random(-4, 4);
-    this.vy = random(-6, -2);
-    this.alpha = 1;
-    this.gravity = 0.08;
+    this.radius = Math.random() * 2 + 1;
+    this.color = color;
+    this.speed = Math.random() * 6 + 2;
+    this.angle = Math.random() * Math.PI * 2;
+    this.vx = Math.cos(this.angle) * this.speed;
+    this.vy = Math.sin(this.angle) * this.speed;
+    this.life = 60;
   }
+
   update() {
     this.x += this.vx;
     this.y += this.vy;
-    this.vy += this.gravity;
-    this.alpha -= 0.015;
+    this.vy += 0.05;
+    this.life--;
   }
+
   draw() {
-    ctx.globalAlpha = this.alpha;
     ctx.beginPath();
     ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
     ctx.fillStyle = this.color;
@@ -156,15 +148,19 @@ class Particle {
 
 let particles = [];
 
+function randomColor() {
+  return `hsl(${Math.random() * 360}, 100%, 60%)`;
+}
+
 function explode(x, y) {
-  for (let i = 0; i < 40; i++) {
-    particles.push(new Particle(x, y));
+  for (let i = 0; i < 80; i++) {
+    particles.push(new Particle(x, y, randomColor()));
   }
 }
 
 function animate() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-  particles = particles.filter(p => p.alpha > 0);
+  particles = particles.filter(p => p.life > 0);
   particles.forEach(p => {
     p.update();
     p.draw();
@@ -173,14 +169,11 @@ function animate() {
 }
 animate();
 
-/* bấm nút */
 document.getElementById("fireworkBtn").addEventListener("click", () => {
-  for (let i = 0; i < 3; i++) {
-    explode(
-      random(100, canvas.width - 100),
-      random(100, canvas.height / 2)
-    );
-  }
+  explode(
+    Math.random() * canvas.width * 0.8 + canvas.width * 0.1,
+    Math.random() * canvas.height * 0.5 + canvas.height * 0.1
+  );
 });
 </script>
 </body>
