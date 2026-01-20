@@ -61,6 +61,31 @@
       font-size: 0.9rem;
       opacity: 0.8;
     }
+    #fireworkBtn {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 1001;
+  padding: 12px 16px;
+  font-size: 16px;
+  border: none;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #ff3b3b, #ffb703);
+  color: white;
+  font-weight: bold;
+  box-shadow: 0 6px 15px rgba(0,0,0,0.25);
+}
+
+/* canvas pháo hoa */
+#fireworks {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 1000;
+}
   </style>
 </head>
 <body>
@@ -82,9 +107,81 @@
   <button>Bấm thử nè🎉</button>
   </a>
 </div>
+<button id="fireworkBtn">🎆 Bắn pháo hoa</button>
 
+<canvas id="fireworks"></canvas>
   </div>  <footer>
     © 2026 • Made by Huỳnh Thanh Giàu(Developer & Designer)
   </footer>
+  <script>
+const canvas = document.getElementById("fireworks");
+const ctx = canvas.getContext("2d");
+
+function resize() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+resize();
+window.addEventListener("resize", resize);
+
+function random(min, max) {
+  return Math.random() * (max - min) + min;
+}
+
+class Particle {
+  constructor(x, y) {
+    this.x = x;
+    this.y = y;
+    this.radius = random(2, 4);
+    this.color = `hsl(${Math.random() * 360}, 100%, 60%)`;
+    this.vx = random(-4, 4);
+    this.vy = random(-6, -2);
+    this.alpha = 1;
+    this.gravity = 0.08;
+  }
+  update() {
+    this.x += this.vx;
+    this.y += this.vy;
+    this.vy += this.gravity;
+    this.alpha -= 0.015;
+  }
+  draw() {
+    ctx.globalAlpha = this.alpha;
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+    ctx.fillStyle = this.color;
+    ctx.fill();
+  }
+}
+
+let particles = [];
+
+function explode(x, y) {
+  for (let i = 0; i < 40; i++) {
+    particles.push(new Particle(x, y));
+  }
+}
+
+function animate() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  particles = particles.filter(p => p.alpha > 0);
+  particles.forEach(p => {
+    p.update();
+    p.draw();
+  });
+  requestAnimationFrame(animate);
+}
+animate();
+
+/* bấm nút */
+document.getElementById("fireworkBtn").addEventListener("click", () => {
+  for (let i = 0; i < 3; i++) {
+    explode(
+      random(100, canvas.width - 100),
+      random(100, canvas.height / 2)
+    );
+  }
+});
+</script>
 </body>
 </html>
